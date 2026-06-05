@@ -22,12 +22,9 @@ defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Components.ActionRow
   def to_map(action_row) do
     %{
       type: 1,
-      components:
-        action_row.components
-        |> maybe_put(:id, action_row.id)
+      components: Enum.map(action_row.components, &Discordex.Discord.Encodable.to_map/1)
     }
+    |> Discordex.Discord.Encodable.Helpers.maybe_put(:id, action_row.id)
   end
 
-  defp maybe_put(map, _key, nil), do: map
-  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 end
