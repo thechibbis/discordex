@@ -1,4 +1,4 @@
-defmodule Discordex.Discord.Channel do
+defmodule Discordex.Types.Channel do
   @moduledoc """
   Discord Channel object.
 
@@ -9,6 +9,8 @@ defmodule Discordex.Discord.Channel do
 
   See: https://docs.discord.com/developers/resources/channel#channel-object
   """
+
+  alias Discordex.Types.{PermissionOverwrite, ThreadMetadata}
 
   defstruct [
     :id,
@@ -53,7 +55,7 @@ defmodule Discordex.Discord.Channel do
           type: integer() | nil,
           guild_id: String.t() | nil,
           position: integer() | nil,
-          permission_overwrites: [map()] | nil,
+          permission_overwrites: [PermissionOverwrite.t()] | nil,
           name: String.t() | nil,
           topic: String.t() | nil,
           nsfw: boolean() | nil,
@@ -72,7 +74,7 @@ defmodule Discordex.Discord.Channel do
           video_quality_mode: integer() | nil,
           message_count: integer() | nil,
           member_count: integer() | nil,
-          thread_metadata: map() | nil,
+          thread_metadata: ThreadMetadata.t() | nil,
           member: map() | nil,
           default_auto_archive_duration: integer() | nil,
           permissions: String.t() | nil,
@@ -96,7 +98,7 @@ defmodule Discordex.Discord.Channel do
       type: payload["type"],
       guild_id: payload["guild_id"],
       position: payload["position"],
-      permission_overwrites: payload["permission_overwrites"],
+      permission_overwrites: decode_permission_overwrites(payload["permission_overwrites"]),
       name: payload["name"],
       topic: payload["topic"],
       nsfw: payload["nsfw"],
@@ -115,7 +117,7 @@ defmodule Discordex.Discord.Channel do
       video_quality_mode: payload["video_quality_mode"],
       message_count: payload["message_count"],
       member_count: payload["member_count"],
-      thread_metadata: payload["thread_metadata"],
+      thread_metadata: decode_thread_metadata(payload["thread_metadata"]),
       member: payload["member"],
       default_auto_archive_duration: payload["default_auto_archive_duration"],
       permissions: payload["permissions"],
@@ -129,10 +131,17 @@ defmodule Discordex.Discord.Channel do
       default_forum_layout: payload["default_forum_layout"]
     }
   end
+
+  defp decode_permission_overwrites(nil), do: nil
+  defp decode_permission_overwrites(overwrites) when is_list(overwrites), do: Enum.map(overwrites, &PermissionOverwrite.decode/1)
+
+  defp decode_thread_metadata(nil), do: nil
+  defp decode_thread_metadata(meta_map), do: ThreadMetadata.decode(meta_map)
 end
 
-defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Channel do
-  alias Discordex.Discord.Encodable.Helpers
+defimpl Discordex.Types.Encodable, for: Discordex.Types.Channel do
+  alias Discordex.Types.Encodable.Helpers
+  alias Discordex.Types.Encodable
 
   def to_map(channel) do
     %{}
@@ -140,7 +149,7 @@ defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Channel do
     |> Helpers.maybe_put(:type, channel.type)
     |> Helpers.maybe_put(:guild_id, channel.guild_id)
     |> Helpers.maybe_put(:position, channel.position)
-    |> Helpers.maybe_put(:permission_overwrites, channel.permission_overwrites)
+    |> maybe_put_permission_overwrites(channel.permission_overwrites)
     |> Helpers.maybe_put(:name, channel.name)
     |> Helpers.maybe_put(:topic, channel.topic)
     |> Helpers.maybe_put(:nsfw, channel.nsfw)
@@ -159,7 +168,7 @@ defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Channel do
     |> Helpers.maybe_put(:video_quality_mode, channel.video_quality_mode)
     |> Helpers.maybe_put(:message_count, channel.message_count)
     |> Helpers.maybe_put(:member_count, channel.member_count)
-    |> Helpers.maybe_put(:thread_metadata, channel.thread_metadata)
+    |> maybe_put_thread_metadata(channel.thread_metadata)
     |> Helpers.maybe_put(:member, channel.member)
     |> Helpers.maybe_put(:default_auto_archive_duration, channel.default_auto_archive_duration)
     |> Helpers.maybe_put(:permissions, channel.permissions)
@@ -172,4 +181,10 @@ defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Channel do
     |> Helpers.maybe_put(:default_sort_order, channel.default_sort_order)
     |> Helpers.maybe_put(:default_forum_layout, channel.default_forum_layout)
   end
+
+  defp maybe_put_permission_overwrites(map, nil), do: map
+  defp maybe_put_permission_overwrites(map, overwrites), do: Map.put(map, :permission_overwrites, Enum.map(overwrites, &Encodable.to_map/1))
+
+  defp maybe_put_thread_metadata(map, nil), do: map
+  defp maybe_put_thread_metadata(map, metadata), do: Map.put(map, :thread_metadata, Encodable.to_map(metadata))
 end

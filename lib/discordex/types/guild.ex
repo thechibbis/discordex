@@ -1,4 +1,4 @@
-defmodule Discordex.Discord.Guild do
+defmodule Discordex.Types.Guild do
   @moduledoc """
   Discord Guild object.
 
@@ -8,6 +8,8 @@ defmodule Discordex.Discord.Guild do
 
   See: https://docs.discord.com/developers/resources/guild#guild-object
   """
+
+  alias Discordex.Types.Sticker
 
   defstruct [
     :id,
@@ -97,7 +99,7 @@ defmodule Discordex.Discord.Guild do
           approximate_presence_count: integer() | nil,
           welcome_screen: map() | nil,
           nsfw_level: integer() | nil,
-          stickers: [map()] | nil,
+          stickers: [Sticker.t()] | nil,
           premium_progress_bar_enabled: boolean() | nil,
           safety_alerts_channel_id: String.t() | nil,
           incidents_data: map() | nil
@@ -149,16 +151,20 @@ defmodule Discordex.Discord.Guild do
       approximate_presence_count: payload["approximate_presence_count"],
       welcome_screen: payload["welcome_screen"],
       nsfw_level: payload["nsfw_level"],
-      stickers: payload["stickers"],
+      stickers: decode_stickers(payload["stickers"]),
       premium_progress_bar_enabled: payload["premium_progress_bar_enabled"],
       safety_alerts_channel_id: payload["safety_alerts_channel_id"],
       incidents_data: payload["incidents_data"]
     }
   end
+
+  defp decode_stickers(nil), do: nil
+  defp decode_stickers(stickers) when is_list(stickers), do: Enum.map(stickers, &Sticker.decode/1)
 end
 
-defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Guild do
-  alias Discordex.Discord.Encodable.Helpers
+defimpl Discordex.Types.Encodable, for: Discordex.Types.Guild do
+  alias Discordex.Types.Encodable.Helpers
+  alias Discordex.Types.Encodable
 
   def to_map(guild) do
     %{}
@@ -202,9 +208,12 @@ defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Guild do
     |> Helpers.maybe_put(:approximate_presence_count, guild.approximate_presence_count)
     |> Helpers.maybe_put(:welcome_screen, guild.welcome_screen)
     |> Helpers.maybe_put(:nsfw_level, guild.nsfw_level)
-    |> Helpers.maybe_put(:stickers, guild.stickers)
+    |> maybe_put_stickers(guild.stickers)
     |> Helpers.maybe_put(:premium_progress_bar_enabled, guild.premium_progress_bar_enabled)
     |> Helpers.maybe_put(:safety_alerts_channel_id, guild.safety_alerts_channel_id)
     |> Helpers.maybe_put(:incidents_data, guild.incidents_data)
   end
+
+  defp maybe_put_stickers(map, nil), do: map
+  defp maybe_put_stickers(map, stickers), do: Map.put(map, :stickers, Enum.map(stickers, &Encodable.to_map/1))
 end
