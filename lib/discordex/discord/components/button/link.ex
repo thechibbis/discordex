@@ -8,7 +8,7 @@ defmodule Discordex.Discord.Components.Button.Link do
     disabled: false
   ]
 
-  @opaque t :: %__MODULE__{
+  @type t :: %__MODULE__{
             id: integer() | nil,
             url: String.t(),
             label: String.t() | nil,
@@ -52,11 +52,9 @@ defimpl Discordex.Discord.Encodable,
       url: button.url,
       disabled: button.disabled
     }
-    |> maybe_put(:id, button.id)
-    |> maybe_put(:label, button.label)
-    |> maybe_put(:emoji, button.emoji)
+    |> Discordex.Discord.Encodable.Helpers.maybe_put(:id, button.id)
+    |> Discordex.Discord.Encodable.Helpers.maybe_put(:label, button.label)
+    |> Discordex.Discord.Encodable.Helpers.maybe_put(:emoji, button.emoji)
   end
 
-  defp maybe_put(map, _key, nil), do: map
-  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 end

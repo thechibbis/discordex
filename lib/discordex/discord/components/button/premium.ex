@@ -6,7 +6,7 @@ defmodule Discordex.Discord.Components.Button.Premium do
     disabled: false
   ]
 
-  @opaque t :: %__MODULE__{
+  @type t :: %__MODULE__{
             id: integer() | nil,
             sku_id: String.t(),
             disabled: boolean()
@@ -41,9 +41,7 @@ defimpl Discordex.Discord.Encodable,
       sku_id: button.sku_id,
       disabled: button.disabled
     }
-    |> maybe_put(:id, button.id)
+    |> Discordex.Discord.Encodable.Helpers.maybe_put(:id, button.id)
   end
 
-  defp maybe_put(map, _key, nil), do: map
-  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 end

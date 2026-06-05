@@ -15,12 +15,12 @@ defmodule Discordex.Discord.Components.ButtonStyle do
   def encode(:link), do: 5
   def encode(:premium), do: 6
 
-  @spec decode(t()) :: {:ok, t()} | {:error, String.t()}
-  def encode(_), do: {:error, "no valid button style"}
+  @spec decode(integer()) :: {:ok, t()} | :error
   def decode(1), do: {:ok, :primary}
   def decode(2), do: {:ok, :secondary}
   def decode(3), do: {:ok, :success}
   def decode(4), do: {:ok, :danger}
   def decode(5), do: {:ok, :link}
   def decode(6), do: {:ok, :premium}
+  def decode(_), do: :error
 end

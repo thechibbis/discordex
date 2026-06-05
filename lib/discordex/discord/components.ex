@@ -1,5 +1,5 @@
 defmodule Discordex.Discord.Components do
-  alias MyDiscord.Component.{
+  alias Discordex.Discord.Components.{
     ActionRow,
     Button,
     StringSelect,

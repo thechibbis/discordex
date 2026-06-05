@@ -11,7 +11,7 @@ defmodule Discordex.Discord.Components.Button.Interactive do
     disabled: false
   ]
 
-  @opaque t :: %__MODULE__{
+  @type t :: %__MODULE__{
             id: integer() | nil,
             custom_id: String.t(),
             style: Button.interactive_style(),
@@ -62,9 +62,9 @@ defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Components.Button.In
       custom_id: button.custom_id,
       disabled: button.disabled
     }
-    |> maybe_put(:id, button.id)
-    |> maybe_put(:label, button.label)
-    |> maybe_put(:emoji, button.emoji)
+    |> Discordex.Discord.Encodable.Helpers.maybe_put(:id, button.id)
+    |> Discordex.Discord.Encodable.Helpers.maybe_put(:label, button.label)
+    |> Discordex.Discord.Encodable.Helpers.maybe_put(:emoji, button.emoji)
   end
 
   defp encode_style(:primary), do: 1
@@ -72,6 +72,4 @@ defimpl Discordex.Discord.Encodable, for: Discordex.Discord.Components.Button.In
   defp encode_style(:success), do: 3
   defp encode_style(:danger), do: 4
 
-  defp maybe_put(map, _key, nil), do: map
-  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 end

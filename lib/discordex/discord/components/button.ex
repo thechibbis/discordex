@@ -7,7 +7,7 @@ defmodule Discordex.Discord.Components.Button do
 
   alias __MODULE__.{Interactive, Link, Premium}
 
-  @opaque t :: Interactive.t() | Link.t() | Premium.t()
+  @type t :: Interactive.t() | Link.t() | Premium.t()
 
   @type interactive_style :: :primary | :secondary | :success | :danger
 
