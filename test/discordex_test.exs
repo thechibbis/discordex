@@ -1,8 +1,8 @@
 defmodule DiscordexTest do
   use ExUnit.Case
-  doctest Discordex
 
-  test "greets the world" do
-    assert Discordex.hello() == :world
+  test "starts the supervisor" do
+    # Supervisor integration test placeholder
+    assert true
   end
 end

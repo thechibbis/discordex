@@ -1,18 +1,30 @@
 defmodule Discordex do
-  @moduledoc """
-  Documentation for `Discordex`.
-  """
+  use Supervisor
 
-  @doc """
-  Hello world.
+  def start_link(opts) do
+    name = Keyword.fetch!(opts, :name)
+    Supervisor.start_link(__MODULE__, opts, name: name)
+  end
 
-  ## Examples
+  @impl true
+  def init(opts) do
+    name = Keyword.fetch!(opts, :name)
+    token = Keyword.fetch!(opts, :token)
+    intents = Keyword.fetch!(opts, :intents)
+    consumer = Keyword.fetch!(opts, :consumer)
 
-      iex> Discordex.hello()
-      :world
+    client = %Discordex.Client{
+      name: name,
+      token: token,
+      intents: intents,
+      consumer: consumer
+    }
 
-  """
-  def hello do
-    :world
+    children = [
+      {Discordex.Gateway.Supervisor, client: client},
+      {Discordex.Gateway.Bootstrap, client: client}
+    ]
+
+    Supervisor.init(children, strategy: :rest_for_one)
   end
 end

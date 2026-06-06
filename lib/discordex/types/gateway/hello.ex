@@ -20,7 +20,7 @@ defmodule Discordex.Types.Gateway.Hello do
   @spec decode(map()) :: t()
   def decode(payload) when is_map(payload) do
     %__MODULE__{
-      heartbeat_interval: payload["heartbeat_interval"]
+      heartbeat_interval: payload["d"]["heartbeat_interval"]
     }
   end
 end

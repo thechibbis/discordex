@@ -7,13 +7,17 @@ defmodule Discordex.Application do
 
   @impl true
   def start(_type, _args) do
-    children = [
-      # Starts a worker by calling: Discordex.Worker.start_link(arg)
-      # {Discordex.Worker, arg}
-    ]
+    token = Application.get_env(:discordex, :token)
+    intents = Application.get_env(:discordex, :intents, [])
+    consumer = Application.get_env(:discordex, :consumer)
+    name = Application.get_env(:discordex, :name, Discordex)
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
+    children = if token && consumer do
+      [{Discordex, name: name, token: token, intents: intents, consumer: consumer}]
+    else
+      []
+    end
+
     opts = [strategy: :one_for_one, name: Discordex.Supervisor]
     Supervisor.start_link(children, opts)
   end
