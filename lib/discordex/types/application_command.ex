@@ -89,7 +89,6 @@ defimpl Discordex.Types.Encodable, for: Discordex.Types.ApplicationCommand do
     |> Helpers.maybe_put(:nsfw, cmd.nsfw)
     |> Helpers.maybe_put(:integration_types, cmd.integration_types)
     |> Helpers.maybe_put(:contexts, cmd.contexts)
-    |> Helpers.maybe_put(:handler, cmd.handler)
   end
 
   defp maybe_put_options(map, nil), do: map

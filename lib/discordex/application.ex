@@ -13,7 +13,10 @@ defmodule Discordex.Application do
     name = Application.get_env(:discordex, :name, Discordex)
 
     children = if token && consumer do
-      [{Discordex, name: name, token: token, intents: intents, consumer: consumer}]
+      [
+        {Discordex.Rest, token: token, name: name},
+        {Discordex, name: name, token: token, intents: intents, consumer: consumer}
+      ]
     else
       []
     end

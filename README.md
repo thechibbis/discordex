@@ -6,17 +6,46 @@ Besides being a learning project for me, I want to migrate my current discord bo
 
 My future goal is to evolve this to a framework that makes it easy to build discord bots in Elixir.
 
-## What we have so far ?
+## What we have so far
 
-if you run `iex -S mix` and then
+### Gateway (WebSocket)
+
+Start a bot connected to Discord's gateway:
 
 ```elixir
-iex> {:ok, _pid} = Discordex.start_link(
-             name: :my_bot,
-             token: "your token",
-             intents: [:guilds],
-             consumer: MyApp.MyConsumer
-           )
+config :discordex,
+  token: "your-bot-token",
+  intents: [:guilds],
+  consumer: MyApp.MyConsumer,
+  name: MyApp.Bot
 ```
 
-you can get an bot running!
+Then implement `Discordex.Consumer` callbacks in `MyApp.MyConsumer`.
+
+### REST API
+
+Register slash commands via Discord's HTTP API. No extra config needed —
+the application ID is automatically discovered.
+
+```elixir
+config :discordex,
+  token: "your-bot-token",
+  intents: [:guilds],
+  consumer: MyApp.MyConsumer,
+  name: MyApp.Bot
+```
+
+From a consumer callback (e.g. `handle_ready/2` or an interaction handler):
+
+```elixir
+alias Discordex.Types.ApplicationCommand
+
+command = %ApplicationCommand{
+  name: "ping",
+  description: "Replies with pong",
+  type: :chat_input
+}
+
+Discordex.Rest.create_global_command(client.name, command)
+# => {:ok, %ApplicationCommand{id: "987654321", ...}}
+```
